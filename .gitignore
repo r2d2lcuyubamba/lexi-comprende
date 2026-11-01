@@ -1,6 +1,6 @@
 node_modules/
 dist/
 dist-single/
-capturas/
+/capturas/
 *.log
 .DS_Store

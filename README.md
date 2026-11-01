@@ -37,7 +37,7 @@ Lexi Comprende es una PWA de comprensión lectora adaptativa para primaria. Un m
 
 | Historia | Qué hace | Archivo principal |
 |---|---|---|
-| HU-19 · RF-04 | Ingreso con código de aula + avatar, sin correo ni contraseña | [`Ingreso.jsx`](src/components/Ingreso.jsx) |
+| HU-19 · RF-04 | Ingreso con código de aula + avatar, sin correo ni contraseña; cada avatar guarda su propio progreso en el dispositivo | [`Ingreso.jsx`](src/components/Ingreso.jsx), [`perfiles.js`](src/perfiles.js) |
 | HU-01 | Inicio con "Aventura del Día", nivel y logros | [`Inicio.jsx`](src/components/Inicio.jsx) |
 | — | Lector de textos | [`Lector.jsx`](src/components/Lector.jsx) |
 | HU-05 · RF-02 | Retroalimentación que cita el texto, pista y segundo intento | [`Preguntas.jsx`](src/components/Preguntas.jsx) |
@@ -96,7 +96,8 @@ src/
 ├── engine/        motor de ventana móvil, casos de prueba y pruebas Vitest
 ├── components/    pantallas (Ingreso, Inicio, Lector, Preguntas, Resultado, PanelPruebas)
 ├── data/          lecturas piloto, preguntas y pistas
-└── App.jsx        navegación, integración con el motor y guardado local
+├── perfiles.js    progreso de cada avatar en el dispositivo
+└── App.jsx        navegación e integración con el motor
 .github/workflows/ci.yml   pruebas automáticas + publicación en GitHub Pages
 docs/              capturas y script de prueba de extremo a extremo (Playwright)
 ```
@@ -108,5 +109,5 @@ docs/              capturas y script de prueba de extremo a extremo (Playwright)
   - Panel docente (HU-06, HU-07, HU-20).
   - API en PHP 8.3 + Laravel 11 + MySQL, con autenticación Sanctum y datos cifrados (HU-11, HU-15).
   - Corrección de 2 hallazgos de usabilidad.
-- **Sprint 3:** modo sin conexión con IndexedDB y sincronización (HU-03, HU-14), y asignación y carga de textos (HU-08, HU-12). En el Sprint 1 el progreso se guarda en el `localStorage` del navegador.
+- **Sprint 3:** modo sin conexión con IndexedDB y sincronización (HU-03, HU-14), y asignación y carga de textos (HU-08, HU-12). En el Sprint 1 el progreso de cada avatar se guarda en el `localStorage` del navegador; en el Sprint 2 pasa a cuentas en el servidor.
 - **Sprint 4:** glosario, medallas y reportes para familias (HU-17, HU-02, HU-10, HU-09, HU-18).

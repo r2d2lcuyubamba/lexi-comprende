@@ -5,24 +5,21 @@ import Lector from "./components/Lector.jsx";
 import Preguntas from "./components/Preguntas.jsx";
 import Resultado from "./components/Resultado.jsx";
 import PanelPruebas from "./components/PanelPruebas.jsx";
-import { estadoInicial, registrarRespuesta, REGLAS_V1 } from "./engine/motor.js";
-
-const CLAVE = "lexi-comprende:v1";
-const perfilNuevo = (usuario) => ({ usuario, motor: estadoInicial(2), monedas: 0, lecturas: 0, perfectas: 0, registro: [] });
-
-// Guardado local (en el Sprint 3 se reemplaza por IndexedDB + sincronización, HU-03/HU-14)
-const cargar = () => { try { return JSON.parse(localStorage.getItem(CLAVE)) || null; } catch { return null; } };
-const guardar = (p) => { try { p ? localStorage.setItem(CLAVE, JSON.stringify(p)) : localStorage.removeItem(CLAVE); } catch { /* sin almacenamiento */ } };
+import { registrarRespuesta, REGLAS_V1 } from "./engine/motor.js";
+import { cargarDatos, guardarDatos, entrar, salir, actualizarActivo, nivelesPorAvatar, borrarTodo } from "./perfiles.js";
 
 export default function App() {
-  const [perfil, setPerfil] = useState(cargar);
+  // Varios perfiles en el mismo dispositivo: cada código de aula + avatar guarda su propio progreso
+  const [datos, setDatos] = useState(cargarDatos);
+  const perfil = datos.activo ? datos.perfiles[datos.activo] : null;
+  const setPerfil = (cambio) => setDatos((d) => actualizarActivo(d, cambio));
   const [pantalla, setPantalla] = useState(perfil ? "inicio" : "ingreso");
   const [lectura, setLectura] = useState(null);
   const [sesion, setSesion] = useState(null);
   const [nivelAntes, setNivelAntes] = useState(null);
   const [volverA, setVolverA] = useState("ingreso");
 
-  useEffect(() => guardar(perfil), [perfil]);
+  useEffect(() => guardarDatos(datos), [datos]);
   useEffect(() => { window.scrollTo(0, 0); }, [pantalla]);
 
   // ← Punto de integración con el motor: cada primer intento entra a la ventana y se decide el nivel
@@ -42,12 +39,15 @@ export default function App() {
       <div className="mx-auto max-w-[420px] min-h-[100dvh] sm:min-h-[820px] bg-crema sm:rounded-[36px] sm:shadow-[0_0_0_10px_#1E2340,0_20px_40px_rgba(0,0,0,.25)] overflow-hidden flex flex-col">
         <div className="flex-1 flex flex-col">
           {pantalla === "ingreso" && (
-            <Ingreso onEntrar={(u) => { setPerfil(perfilNuevo(u)); setPantalla("inicio"); }} onPruebas={() => abrirPruebas("ingreso")} />
+            <Ingreso progresoDe={(codigo) => nivelesPorAvatar(datos, codigo)}
+              onEntrar={(u) => { setDatos((d) => entrar(d, u)); setPantalla("inicio"); }}
+              onBorrar={() => setDatos(borrarTodo())}
+              onPruebas={() => abrirPruebas("ingreso")} />
           )}
           {pantalla === "inicio" && perfil && (
             <Inicio perfil={perfil}
               onComenzar={(l) => { setLectura(l); setNivelAntes(perfil.motor.nivel); setPantalla("lector"); }}
-              onSalir={() => { setPerfil(null); setPantalla("ingreso"); }}
+              onSalir={() => { setDatos(salir); setPantalla("ingreso"); }}
               onPruebas={() => abrirPruebas("inicio")} />
           )}
           {pantalla === "lector" && (

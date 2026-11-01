@@ -4,10 +4,13 @@ import { AVATARES, Avatar } from "./Iconos.jsx";
 // HU-19 · RF-04: ingreso con código de aula + avatar, sin correo ni contraseña.
 export const CODIGOS_AULA = { "4B7K": "4.° grado “B”" };
 
-export default function Ingreso({ onEntrar, onPruebas }) {
+export default function Ingreso({ onEntrar, onPruebas, onBorrar, progresoDe }) {
   const [codigo, setCodigo] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [error, setError] = useState("");
+  const [confirmar, setConfirmar] = useState(false);
+  const progreso = codigo.length === 4 && CODIGOS_AULA[codigo.toUpperCase()] ? progresoDe(codigo.toUpperCase()) : {};
+  const hayPerfiles = Object.keys(progresoDe("4B7K")).length > 0;
 
   const entrar = (e) => {
     e.preventDefault();
@@ -43,6 +46,7 @@ export default function Ingreso({ onEntrar, onPruebas }) {
             className={`tarjeta p-2.5 border-[3px] flex flex-col items-center ${avatar?.id === a.id ? "border-morado" : "border-transparent"}`}>
             <Avatar avatar={a} size={68} />
             <span className="text-[13px] font-semibold mt-1">{a.nombre}</span>
+            {progreso[a.id] && <span className="chip bg-morado-claro text-morado mt-1 !text-[11px] !py-0.5">Nivel {progreso[a.id].nivel}</span>}
           </button>
         ))}
       </div>
@@ -51,9 +55,19 @@ export default function Ingreso({ onEntrar, onPruebas }) {
       <p className="text-gris text-xs mt-3">Sin correo ni contraseña · Datos protegidos (Ley 29733)</p>
       <p className="text-gris text-xs mt-1">Código de prueba para la demo: <b className="text-tinta">4B7K</b></p>
 
+      <p className="text-gris text-xs mt-1">Cada avatar guarda su propio progreso en este dispositivo.</p>
+
       <button type="button" onClick={onPruebas} className="mt-auto pt-6 text-sm font-semibold text-morado underline underline-offset-4">
         Panel de pruebas del motor adaptativo (docente / evaluador)
       </button>
+      {hayPerfiles && (confirmar ? (
+        <p className="mt-3 text-sm">¿Borrar el progreso de todos los avatares?{" "}
+          <button type="button" onClick={() => { onBorrar(); setConfirmar(false); }} className="font-semibold text-[#C23B1E] underline underline-offset-4">Sí, borrar</button>{" · "}
+          <button type="button" onClick={() => setConfirmar(false)} className="font-semibold text-gris underline underline-offset-4">Cancelar</button>
+        </p>
+      ) : (
+        <button type="button" onClick={() => setConfirmar(true)} className="mt-3 text-xs font-semibold text-gris underline underline-offset-4">Borrar datos de prueba de este dispositivo</button>
+      ))}
     </form>
   );
 }
