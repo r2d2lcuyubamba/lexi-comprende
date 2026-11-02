@@ -8,7 +8,7 @@ Lexi Comprende es una PWA de comprensión lectora adaptativa para primaria. Un m
 
 | Integrante | Rol |
 |---|---|
-| Lidia Magali Raá Espinoza   Scrum Master |
+| Lidia Magali Raá Espinoza |  Scrum Master |
 | Lissette Marjory Romero Quispe | Product Owner |
 | Luis Arturo Cuyubamba Nuñez  | Developer |
 
