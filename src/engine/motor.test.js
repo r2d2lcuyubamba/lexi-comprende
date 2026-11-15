@@ -1,6 +1,6 @@
 // Pruebas automatizadas del motor adaptativo (ejecutar con: npm test)
 import { describe, it, expect } from "vitest";
-import { porcentaje, evaluarVentana, registrarRespuesta, estadoInicial, simularSesion, REGLAS_V1, REGLAS_V1_1 } from "./motor.js";
+import { porcentaje, evaluarVentana, registrarRespuesta, estadoInicial, simularSesion, REGLAS_V1, REGLAS_V1_1, REGLAS_ACTIVAS } from "./motor.js";
 import { CASOS, CASO_HALLAZGO } from "./casosPrueba.js";
 
 describe("Motor de ventana móvil v1 — criterios de aceptación HU-13 / RF-01", () => {
@@ -44,5 +44,21 @@ describe("Hallazgo de la Revisión del Sprint 1", () => {
   });
   it("v1.1 (propuesta HU-13b) exige acertar al menos una pregunta de cada habilidad para subir", () => {
     expect(CASO_HALLAZGO.ejecutar(REGLAS_V1_1).ok).toBe(true);
+  });
+});
+
+describe("Sprint 2 · HU-13b: la app usa el motor v1.1", () => {
+  it("las reglas activas exigen acertar cada tipo de pregunta", () => {
+    expect(REGLAS_ACTIVAS.exigirCadaHabilidad).toBe(true);
+  });
+  for (const caso of [...CASOS, CASO_HALLAZGO]) {
+    it(`${caso.id} pasa con v1.1`, () => {
+      expect(caso.ejecutar(REGLAS_ACTIVAS).ok).toBe(true);
+    });
+  }
+  it("con ✓✓✓✓✗ se mantiene en su nivel e informa que falta la crítica", () => {
+    const { traza, nivelFinal } = simularSesion([true, true, true, true, false], 2, REGLAS_ACTIVAS);
+    expect(nivelFinal).toBe(2);
+    expect(traza.at(-1).accion).toContain("critica");
   });
 });

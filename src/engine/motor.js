@@ -22,8 +22,11 @@ export const REGLAS_V1 = Object.freeze({
   nivelMax: 5,
 });
 
-/** Propuesta para el Sprint 2 (HU-13b): para subir, debe acertar al menos una pregunta de cada habilidad presente. */
+/** Sprint 2 (HU-13b): para subir, debe acertar al menos una pregunta de cada habilidad presente. */
 export const REGLAS_V1_1 = Object.freeze({ ...REGLAS_V1, exigirCadaHabilidad: true });
+
+/** Reglas que usa la app. Desde el Sprint 2: v1.1 (HU-13b). */
+export const REGLAS_ACTIVAS = REGLAS_V1_1;
 
 export function estadoInicial(nivel = 2) {
   return {
