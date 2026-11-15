@@ -1,20 +1,33 @@
 import { useState } from "react";
 import { AVATARES, Avatar } from "./Iconos.jsx";
+import { nube } from "../lib/nube.js";
 
 // HU-19 · RF-04: ingreso con código de aula + avatar, sin correo ni contraseña.
+// Sprint 2 (HU-20): los códigos los crea el docente en el panel (Appsmith + Supabase).
+// El código 4B7K se mantiene para la demo sin conexión.
 export const CODIGOS_AULA = { "4B7K": "4.° grado “B”" };
+const POR_PAGINA = 4; // Revisión Sprint 1: máximo 4 avatares por pantalla
 
 export default function Ingreso({ onEntrar, onPruebas, onBorrar, progresoDe }) {
   const [codigo, setCodigo] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [error, setError] = useState("");
   const [confirmar, setConfirmar] = useState(false);
+  const [pagina, setPagina] = useState(0);
+  const [aulasNube, setAulasNube] = useState({});
+  const paginas = Math.ceil(AVATARES.length / POR_PAGINA);
+  const visibles = AVATARES.slice(pagina * POR_PAGINA, (pagina + 1) * POR_PAGINA);
   const progreso = codigo.length === 4 && CODIGOS_AULA[codigo.toUpperCase()] ? progresoDe(codigo.toUpperCase()) : {};
   const hayPerfiles = Object.keys(progresoDe("4B7K")).length > 0;
 
-  const entrar = (e) => {
+  const entrar = async (e) => {
     e.preventDefault();
-    const aula = CODIGOS_AULA[codigo.toUpperCase()];
+    const c = codigo.toUpperCase();
+    let aula = CODIGOS_AULA[c] || aulasNube[c];
+    if (!aula && nube.activa) {
+      aula = await nube.validarCodigo(c); // código creado por el docente en el panel
+      if (aula) setAulasNube((a) => ({ ...a, [c]: aula }));
+    }
     if (!aula) { setError("Ese código no existe. Pídele a tu profe el código de tu aula."); return; }
     onEntrar({ avatarId: avatar.id, nombre: avatar.nombre, aula, codigo: codigo.toUpperCase() });
   };
@@ -40,16 +53,21 @@ export default function Ingreso({ onEntrar, onPruebas, onBorrar, progresoDe }) {
       {error && <p role="alert" className="mt-3 text-[15px] font-semibold text-[#C23B1E]">{error}</p>}
 
       <p className="mt-7 text-left font-bold text-[15px]">2. Toca tu avatar</p>
-      <div className="grid grid-cols-3 gap-3 mt-3">
-        {AVATARES.map((a) => (
+      <div className="grid grid-cols-2 gap-3 mt-3">
+        {visibles.map((a) => (
           <button type="button" key={a.id} onClick={() => setAvatar(a)} aria-pressed={avatar?.id === a.id}
             className={`tarjeta p-2.5 border-[3px] flex flex-col items-center ${avatar?.id === a.id ? "border-morado" : "border-transparent"}`}>
             <Avatar avatar={a} size={68} />
-            <span className="text-[13px] font-semibold mt-1">{a.nombre}</span>
+            <span className="text-[16px] font-semibold mt-1">{a.nombre}</span>
             {progreso[a.id] && <span className="chip bg-morado-claro text-morado mt-1 !text-[11px] !py-0.5">Nivel {progreso[a.id].nivel}</span>}
           </button>
         ))}
       </div>
+      {paginas > 1 && (
+        <button type="button" onClick={() => setPagina((p) => (p + 1) % paginas)} className="mt-3 text-[16px] font-semibold text-morado underline underline-offset-4">
+          {pagina + 1 < paginas ? "Ver más avatares →" : "← Volver a los primeros"}
+        </button>
+      )}
 
       <button type="submit" disabled={codigo.length < 4 || !avatar} className="btn-morado mt-7 w-full h-16 text-xl">¡Entrar!</button>
       <p className="text-gris text-xs mt-3">Sin correo ni contraseña · Datos protegidos (Ley 29733)</p>

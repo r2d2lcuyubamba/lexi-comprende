@@ -21,7 +21,7 @@ export default function Inicio({ perfil, onComenzar, onSalir, onPruebas }) {
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Avatar avatar={avatar} size={50} />
-          <div className="text-left"><p className="text-gris text-xs">{saludo}</p><p className="font-extrabold text-xl">{perfil.usuario.nombre}</p></div>
+          <div className="text-left"><p className="text-gris text-[16px]">{saludo}</p><p className="font-extrabold text-xl">{perfil.usuario.nombre}</p></div>
         </div>
         <span className="chip bg-white shadow-[0_2px_0_#E2DCD0]"><Moneda /> {perfil.monedas}</span>
       </header>
@@ -42,7 +42,7 @@ export default function Inicio({ perfil, onComenzar, onSalir, onPruebas }) {
         <div className="h-4 bg-morado-claro rounded-full mt-2.5" role="progressbar" aria-valuenow={avance} aria-valuemin={0} aria-valuemax={100}>
           <div className="h-full bg-morado rounded-full transition-all duration-700" style={{ width: `${avance}%` }} />
         </div>
-        <p className="text-gris text-xs mt-2">{ventana.length === 0 ? `Acierta 4 de 5 preguntas para subir al Nivel ${Math.min(nivel + 1, 5)}` : `Llevas ${aciertos} de ${ventana.length} correctas · necesitas 4 de 5 para subir`}</p>
+        <p className="text-gris text-[16px] mt-2">{ventana.length === 0 ? `Acierta 4 de 5 preguntas para subir al Nivel ${Math.min(nivel + 1, 5)}` : `Llevas ${aciertos} de ${ventana.length} correctas · necesitas 4 de 5 para subir`}</p>
       </section>
 
       <h3 className="mt-5 font-bold text-left">Mis logros</h3>
