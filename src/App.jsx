@@ -5,7 +5,8 @@ import Lector from "./components/Lector.jsx";
 import Preguntas from "./components/Preguntas.jsx";
 import Resultado from "./components/Resultado.jsx";
 import PanelPruebas from "./components/PanelPruebas.jsx";
-import { registrarRespuesta, REGLAS_V1 } from "./engine/motor.js";
+import { registrarRespuesta, REGLAS_ACTIVAS } from "./engine/motor.js";
+import { nube } from "./lib/nube.js";
 import { cargarDatos, guardarDatos, entrar, salir, actualizarActivo, nivelesPorAvatar, borrarTodo } from "./perfiles.js";
 
 export default function App() {
@@ -23,11 +24,13 @@ export default function App() {
   useEffect(() => { window.scrollTo(0, 0); }, [pantalla]);
 
   // ← Punto de integración con el motor: cada primer intento entra a la ventana y se decide el nivel
-  const onRespuesta = (habilidad, correcta) =>
-    setPerfil((p) => {
-      const { estado, evento } = registrarRespuesta(p.motor, habilidad, correcta, REGLAS_V1);
-      return { ...p, motor: estado, registro: [...p.registro, { ...evento, fecha: Date.now() }] };
-    });
+  // Sprint 2: motor v1.1 (HU-13b) y envío del primer intento a Supabase (HU-21)
+  const onRespuesta = (habilidad, correcta) => {
+    const { estado, evento } = registrarRespuesta(perfil.motor, habilidad, correcta, REGLAS_ACTIVAS);
+    setPerfil((p) => ({ ...p, motor: estado, registro: [...p.registro, { ...evento, fecha: Date.now() }] }));
+    const u = perfil.usuario;
+    nube.enviarRespuesta({ codigo: u.codigo, avatarId: u.avatarId, alias: u.nombre, lecturaId: lectura.id, habilidad, correcta, nivel: evento.nivelAntes });
+  };
 
   const abrirPruebas = (desde) => { setVolverA(desde); setPantalla("pruebas"); };
 

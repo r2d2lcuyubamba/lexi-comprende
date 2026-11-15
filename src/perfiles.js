@@ -1,6 +1,7 @@
 // Perfiles de estudiantes guardados en el dispositivo (Sprint 1).
 // Cada combinación código de aula + avatar tiene su propio progreso.
-// En el Sprint 2 este guardado se reemplaza por cuentas en el servidor (Laravel + MySQL, HU-11/HU-20).
+// Sprint 2: además, cada primer intento se envía a Supabase (src/lib/nube.js, HU-21).
+// El progreso local se mantiene para que la app funcione sin conexión.
 import { estadoInicial } from "./engine/motor.js";
 
 const CLAVE = "lexi-comprende:v2";

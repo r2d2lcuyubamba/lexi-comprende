@@ -4,3 +4,5 @@ dist-single/
 /capturas/
 *.log
 .DS_Store
+.env
+.env.local
