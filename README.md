@@ -1,10 +1,10 @@
-# Lexi Comprende — Incremento del Sprint 1
+# Lexi Comprende — Sprint 1 (React) + Sprint 2 (Low Code: Supabase + Appsmith)
 
 ![Pruebas y publicación](https://github.com/r2d2lcuyubamba/lexi-comprende/actions/workflows/ci.yml/badge.svg)
 
 Lexi Comprende es una PWA de comprensión lectora adaptativa para primaria. Un motor adaptativo sube o baja el nivel de los textos según los aciertos recientes de cada estudiante.
 
-**Producto Académico N.° 1 · SCRUM**
+**Producto Académico N.° 1 y N.° 2 · SCRUM · Low Code / No Code**
 
 | Integrante | Rol |
 |---|---|
@@ -30,6 +30,49 @@ Lexi Comprende es una PWA de comprensión lectora adaptativa para primaria. Un m
   <img src="docs/capturas/app_05_pista.png" width="190" alt="Pista tras un error">
   <img src="docs/capturas/app_06_resultado.png" width="190" alt="Resultado y nivel">
 </p>
+
+## Sprint 2 · Panel docente con plataformas Low Code (PA2)
+
+| Criterio de la rúbrica | Evidencia en este repositorio |
+|---|---|
+| **Selección de plataforma** | Supabase (backend Low Code) + Appsmith (panel docente). Justificación y comparación en el informe PA2, sección 1 |
+| **Diseño pedagógico y UX/UI** | Guía de pantallas en [`appsmith/README.md`](appsmith/README.md) · capturas en `docs/capturas/sprint2/` |
+| **Aplicación funcional Low Code** | Panel exportado [`appsmith/panel-docente.json`](appsmith/) · base de datos [`supabase/schema.sql`](supabase/schema.sql) · app del estudiante conectada con [`src/lib/nube.js`](src/lib/nube.js) |
+| **Metodología SCRUM** | [`docs/sprint2/`](docs/sprint2/) (planning, daily, review, retro) · tablero en **Projects** · *issues* por historia · commits con ID de historia |
+
+| Qué revisar | Dónde |
+|---|---|
+| Panel docente (Appsmith) | ENLACE-PUBLICO-DE-APPSMITH (usuario de prueba: docente.demo@ejemplo.com) |
+| App del estudiante | https://r2d2lcuyubamba.github.io/lexi-comprende/ |
+| Seguridad (RLS, Ley 29733) | [`supabase/schema.sql`](supabase/schema.sql) · [`supabase/pruebas_rls.sql`](supabase/pruebas_rls.sql) |
+| Pruebas automatizadas | Pestaña **Actions**: 25 pruebas (motor v1.1 + registro en la nube) |
+
+### Arquitectura del Sprint 2
+
+```mermaid
+flowchart LR
+  E[App del estudiante<br/>React + motor v1.1] -- "registrar_respuesta()<br/>clave anon" --> S[(Supabase<br/>PostgreSQL + Auth + RLS)]
+  D[Panel docente<br/>Appsmith] -- "consultas con sesión<br/>de la docente" --> S
+  S --> V[Vistas<br/>v_aciertos_habilidad · v_alertas]
+  V --> D
+```
+
+### Cómo poner en marcha el backend
+
+1. Crear un proyecto en [supabase.com](https://supabase.com) y ejecutar `supabase/schema.sql` en el *SQL Editor*.
+2. Crear la docente de prueba en *Authentication → Users* y ejecutar `supabase/seed.sql`.
+3. Copiar `.env.example` como `.env` y completar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`.
+4. `npm install` y `npm run dev`. Sin `.env`, la app funciona igual que en el Sprint 1 (solo en el dispositivo).
+5. Importar `appsmith/panel-docente.json` en Appsmith y conectar el datasource (ver `appsmith/README.md`).
+
+### Qué cambió en la app del estudiante
+
+| Historia | Cambio | Archivo |
+|---|---|---|
+| HU-13b | La app usa el motor v1.1: para subir hay que acertar al menos una pregunta de cada tipo | [`motor.js`](src/engine/motor.js) |
+| HU-21 | Cada primer intento se envía a Supabase; sin internet queda en cola y se reenvía sin duplicados | [`nube.js`](src/lib/nube.js), [`nube.test.js`](src/lib/nube.test.js) |
+| HU-20 | El ingreso acepta los códigos creados por la docente en el panel | [`Ingreso.jsx`](src/components/Ingreso.jsx) |
+| Revisión S1 | 4 avatares por página y etiquetas secundarias de 16 px | [`Ingreso.jsx`](src/components/Ingreso.jsx), [`Inicio.jsx`](src/components/Inicio.jsx) |
 
 ---
 
