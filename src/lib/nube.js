@@ -71,3 +71,7 @@ export const nube = crearNube({
 if (typeof window !== "undefined" && nube.activa) {
   window.addEventListener("online", () => nube.sincronizar());
 }
+if (typeof window !== "undefined" && nube.activa) {
+  window.addEventListener("online", () => nube.sincronizar());
+  nube.sincronizar(); // al abrir la app, envía lo que haya quedado pendiente
+}
