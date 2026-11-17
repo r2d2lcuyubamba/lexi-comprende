@@ -1,40 +1,47 @@
 # Panel docente en Appsmith (Sprint 2 · Low Code)
 
-El panel docente se construye **sin programar el backend**, con widgets de arrastrar y soltar de
-[Appsmith](https://www.appsmith.com) conectados a Supabase.
+Panel para docentes construido **sin programar el backend**: pantallas de arrastrar y soltar en
+[Appsmith](https://www.appsmith.com) conectadas a la API REST que Supabase genera automáticamente.
 
-> **Entrega obligatoria:** exportar la app desde Appsmith (menú de la app → *Export*) y guardar el
-> archivo aquí como `appsmith/panel-docente.json`. Así la docente puede importarla y revisar cada
-> pantalla y consulta.
+| Qué | Dónde |
+|---|---|
+| Panel publicado | https://lexicomprende.appsmith.com/app/panel-docente-lexi/inicio-de-sesion-6afa2353615795a1c895834e |
+| Usuario de prueba | `docente.demo@ejemplo.com` (datos ficticios) |
+| App exportada | [`panel-docente.json`](panel-docente.json) (Appsmith → *Import*) |
+| Capturas | [`docs/capturas/sprint2/`](../docs/capturas/sprint2/) |
 
-## 1. Conectar Supabase (datasource)
+## Por qué se conecta por la API REST
 
-1. En Supabase: *Project Settings → Database → Connection string* (usar el *Session pooler*).
-2. En Appsmith: *Data → New datasource → PostgreSQL* y pegar host, puerto, base, usuario y contraseña.
-3. Para el inicio de sesión de la docente, crear un segundo datasource *REST API* apuntando a
-   `https://TU-PROYECTO.supabase.co/auth/v1` con el header `apikey: <clave anon>`.
+Si Appsmith se conectara directamente a PostgreSQL con la contraseña maestra, vería los datos de
+todas las aulas y se saltaría la seguridad por filas (RLS). Por eso cada consulta envía el token de
+la docente que inició sesión, y Supabase solo le devuelve **sus** aulas (HU-11, HU-15).
 
-> Las consultas de Appsmith deben filtrar por la docente que inició sesión
-> (`docente_id = '{{appsmith.store.usuario.id}}'`) o usar la API REST con su token, para que
-> se aplique el RLS de `supabase/schema.sql`.
+## Conexiones (datasources)
 
-## 2. Pantallas y widgets
-
-| Pantalla | Widgets | Consulta (query) | Historia |
+| Nombre | Tipo | URL base | Header fijo |
 |---|---|---|---|
-| Inicio de sesión | Input correo, Input contraseña, Button | `login`: POST `/token?grant_type=password` → guarda el token en `appsmith.store` | HU-11 |
-| Mis aulas | Table, Form (nombre, grado), Button *Renovar código*, Text grande con el código | `listar_aulas`, `crear_aula` (INSERT en `aulas`), `renovar` (`select renovar_codigo(...)`) | HU-20 |
-| Desempeño del aula | 3 Stat box, Chart (barras), Select de semana | `select * from v_aciertos_habilidad where aula_id = ... and semana = ...` | HU-06 |
-| Alertas tempranas | Table con columna de color/ícono para prioridad | `select * from v_alertas where aula_id = ... order by prioridad desc` | HU-07 |
-| Detalle del estudiante | Text, List | respuestas del estudiante seleccionado | HU-06 |
+| `SupabaseAuth` | Authenticated API | `https://<proyecto>.supabase.co/auth/v1` | `apikey: <clave anon>` |
+| `SupabaseDatos` | Authenticated API | `https://<proyecto>.supabase.co/rest/v1` | `apikey: <clave anon>` |
 
-## 3. Reglas de diseño (DoD)
+Todas las consultas de `SupabaseDatos` llevan además `Authorization: Bearer {{appsmith.store.token}}`.
 
-- Máximo 5 elementos interactivos por zona de trabajo; textos ≥ 16 px.
-- Colores de alerta siempre con palabra e ícono (“Urgente”, “Atención”).
+## Pantallas y consultas
+
+| Página | Qué ve la docente | Consultas | Historia |
+|---|---|---|---|
+| Inicio de Sesion | Correo, contraseña y botón *Ingresar* | `login`: POST `/token?grant_type=password`; guarda el token con `storeValue` | HU-11 |
+| Mis Aulas | Tabla de aulas, formulario *Nueva aula*, código grande y botón *Cambiar código* | `listar_aulas` (GET `/aulas`), `crear_aula` (POST `/aulas`), `renovar_codigo` (POST `/rpc/renovar_codigo`) | HU-20 |
+| Desempeño | Selector de aula y semana; gráfico de % de aciertos literal, inferencial y crítico | `aulas`, `aciertos` (GET `/v_aciertos_habilidad`) | HU-06 |
+| Alertas | Selector de aula; tabla con estudiante, prioridad (color + palabra), motivo y acción sugerida | `aulas_alertas`, `alertas` (GET `/v_alertas`) | HU-07 |
+
+## Diseño
+
+- Tema: fuente Nunito Sans, color principal `#5B3FD0` (el morado de la app del estudiante), fondo `#FAF7F2`.
+- Un solo botón principal por tarjeta; acciones secundarias con borde.
+- Las alertas usan color **y** palabra (“Urgente”, “Atención”), para no depender solo del color.
 - Lenguaje docente: “Comprensión literal / inferencial / crítica”.
 
-## 4. Capturas
+## Notas de uso
 
-Guardar en `docs/capturas/sprint2/`: `panel_01_login.png`, `panel_02_aulas.png`,
-`panel_03_desempeno.png`, `panel_04_alertas.png`.
+- El permiso de inicio de sesión dura cerca de 1 hora; después hay que volver a ingresar.
+- El plan gratuito de Supabase pausa los proyectos sin uso: abrirlo antes de una demostración.

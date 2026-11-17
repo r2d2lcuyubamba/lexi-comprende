@@ -42,7 +42,7 @@ Lexi Comprende es una PWA de comprensión lectora adaptativa para primaria. Un m
 
 | Qué revisar | Dónde |
 |---|---|
-| Panel docente (Appsmith) | ENLACE-PUBLICO-DE-APPSMITH (usuario de prueba: docente.demo@ejemplo.com) |
+| Panel docente (Appsmith) | https://lexicomprende.appsmith.com/app/panel-docente-lexi/inicio-de-sesion-6afa2353615795a1c895834e (usuario de prueba: docente.demo@ejemplo.com) |
 | App del estudiante | https://r2d2lcuyubamba.github.io/lexi-comprende/ |
 | Seguridad (RLS, Ley 29733) | [`supabase/schema.sql`](supabase/schema.sql) · [`supabase/pruebas_rls.sql`](supabase/pruebas_rls.sql) |
 | Pruebas automatizadas | Pestaña **Actions**: 25 pruebas (motor v1.1 + registro en la nube) |
